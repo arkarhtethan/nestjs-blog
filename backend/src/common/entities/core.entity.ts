@@ -1,17 +1,18 @@
 import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Type } from 'class-transformer';
 
 export class CoreEntity {
 
     @PrimaryGeneratedColumn()
-    @Field(type => Number)
+    @Type(type => Number)
     id: number;
 
     @CreateDateColumn()
-    @Field(type => Date)
+    @Type(type => Date)
     createdAt: Date;
 
     @UpdateDateColumn()
-    @Field(type => Date)
+    @Type(type => Date)
     updatedAt: Date;
 
 }
