@@ -26,7 +26,7 @@ export class Post extends CoreEntity {
     @Type(() => String)
     coverImage: string;
 
-    @ManyToOne(() => User, user => user.posts, { nullable: false })
+    @ManyToOne(() => User, user => user.posts, { nullable: false, onDelete: "CASCADE" })
     user: User;
 
     @BeforeInsert()
