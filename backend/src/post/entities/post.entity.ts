@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 import { CoreEntity } from "src/common/entities/core.entity";
-import { Column, Entity } from "typeorm";
+import { BeforeInsert, Column, Entity } from "typeorm";
 import { IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -12,11 +13,9 @@ export class Post extends CoreEntity {
     title: string;
 
     @Column()
-    @IsString()
-    @Type(() => String)
     slug: string;
 
-    @Column()
+    @Column('text')
     @IsString()
     @Type(() => String)
     description: string;
@@ -25,4 +24,9 @@ export class Post extends CoreEntity {
     @IsString()
     @Type(() => String)
     coverImage: string;
+
+    @BeforeInsert()
+    generateSlug () {
+        this.slug = `${this.title.toLocaleLowerCase().replace(/ /g, '-')}-${Date.now()}`
+    }
 }
