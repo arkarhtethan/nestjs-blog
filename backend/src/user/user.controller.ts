@@ -14,7 +14,7 @@ export class UserController {
 
   @Post()
   register (@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    return this.userService.register(createUserDto);
   }
 
   @Post('login')
@@ -44,7 +44,7 @@ export class UserController {
 
   @Delete()
   @Role(['User'])
-  remove (@AuthUser() user: User) {
-    return this.userService.remove(user);
+  deleteAccount (@AuthUser() user: User) {
+    return this.userService.deleteAccount(user);
   }
 }

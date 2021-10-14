@@ -19,7 +19,7 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) { }
 
-  async create (createUserDto: CreateUserDto): Promise<CreateUserOutput> {
+  async register (createUserDto: CreateUserDto): Promise<CreateUserOutput> {
     try {
       const user = await this.usersRepository.create(createUserDto);
       await this.usersRepository.save(user);
@@ -125,7 +125,7 @@ export class UserService {
     }
   }
 
-  async remove (authUser: User): Promise<DeleteUserOutput> {
+  async deleteAccount (authUser: User): Promise<DeleteUserOutput> {
     try {
       const { id } = authUser;
       const user = await this.usersRepository.findOne({ id });
