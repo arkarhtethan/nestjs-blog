@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePostDto, CreatePostOutput } from './dto/create-post.dto';
@@ -10,10 +10,9 @@ import { Post } from './entities/post.entity';
 
 @Injectable()
 export class PostService {
-
   constructor(
     @InjectRepository(Post)
-    private readonly postsRepository: Repository<Post>
+    private readonly postsRepository: Repository<Post>,
   ) { }
 
   async create (createPostDto: CreatePostDto): Promise<CreatePostOutput> {
@@ -23,12 +22,13 @@ export class PostService {
       return {
         post,
         ok: true,
-      }
+      };
     } catch (error) {
+      Logger.error(error);
       return {
         ok: false,
-        error: "Can't create post."
-      }
+        error: "Can't create post.",
+      };
     }
   }
 
@@ -38,12 +38,12 @@ export class PostService {
       return {
         posts,
         ok: true,
-      }
+      };
     } catch (error) {
       return {
         ok: false,
-        error: "Can't get all posts."
-      }
+        error: "Can't get all posts.",
+      };
     }
   }
 
@@ -53,39 +53,42 @@ export class PostService {
       if (!post) {
         return {
           ok: false,
-          error: "Post not found."
-        }
+          error: 'Post not found.',
+        };
       }
       return {
         post,
         ok: true,
-      }
+      };
     } catch (error) {
       return {
         ok: false,
-        error: "Can't get post."
-      }
+        error: "Can't get post.",
+      };
     }
   }
 
-  async update (id: number, updatePostDto: UpdatePostDto): Promise<UpdatePostOutput {
+  async update (
+    id: number,
+    updatePostDto: UpdatePostDto,
+  ): Promise<UpdatePostOutput> {
     try {
       let post = await this.postsRepository.findOne({ id });
       if (!post) {
         return {
           ok: false,
-          error: "Post not found",
+          error: 'Post not found',
         };
       }
       // check ownership
       await this.postsRepository.update(id, updatePostDto);
       post = await this.postsRepository.findOne({ id });
-      return { ok: true, post }
+      return { ok: true, post };
     } catch (error) {
       return {
         ok: false,
-        error: "Cannot update post."
-      }
+        error: 'Cannot update post.',
+      };
     }
   }
 
@@ -95,19 +98,19 @@ export class PostService {
       if (!post) {
         return {
           ok: false,
-          error: "Post not found",
+          error: 'Post not found',
         };
       }
       //TODO: check ownership
       await this.postsRepository.delete({ id });
       return {
         ok: true,
-      }
+      };
     } catch (error) {
       return {
         ok: false,
-        error: "Can't delete post."
-      }
+        error: "Can't delete post.",
+      };
     }
   }
 }

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PostModule } from './post/post.module';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Post } from './post/entities/post.entity';
 
 console.log(process.env.NODE_ENV)
 
@@ -27,7 +28,7 @@ console.log(process.env.NODE_ENV)
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [],
+      entities: [Post],
       synchronize: true,
     }),
     PostModule
