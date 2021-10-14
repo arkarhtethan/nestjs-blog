@@ -7,6 +7,7 @@ import { LoginDto } from './dto/login.dto';
 import { Role } from 'src/auth/role.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from './entities/user.entity';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -28,6 +29,13 @@ export class UserController {
     return this.userService.findAll();
   }
 
+
+  @Get('profile')
+  @Role(['User', 'Admin'])
+  myProfile (@AuthUser() user: User) {
+    return this.userService.myProfile(user);
+  }
+
   @Get(':id')
   findOne (@Param() getUserDto: GetUserDto) {
     return this.userService.findOne(getUserDto);
@@ -40,6 +48,16 @@ export class UserController {
     @AuthUser() user: User
   ) {
     return this.userService.update(updateUserDto, user);
+  }
+
+  @Patch('change-password')
+  @Role(['User'])
+  changePassword (
+    @Body() changePasswordDto: ChangePasswordDto,
+    @AuthUser() user: User
+  ) {
+    console.log(changePasswordDto)
+    return this.userService.changePassword(changePasswordDto, user);
   }
 
   @Delete()
