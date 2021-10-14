@@ -1,26 +1,130 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from 'src/jwt/jwt.service';
+import { Repository } from 'typeorm';
+import { CreateUserDto, CreateUserOutput } from './dto/create-user.dto';
+import { GetUserDto, GetUserOutput } from './dto/get-user.dto';
+import { GetUsersOutput } from './dto/get-users.dto';
+import { LoginDto, LoginOutput } from './dto/login.dto';
+import { UpdateUserDto, UpdateUserOutput } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+    private readonly jwtService: JwtService,
+  ) { }
+
+  async create (createUserDto: CreateUserDto): Promise<CreateUserOutput> {
+    try {
+      const user = await this.usersRepository.create(createUserDto);
+      await this.usersRepository.save(user);
+      return {
+        ok: true,
+      }
+    } catch (error) {
+      if (error.errno && error.errno === 1062) {
+        return {
+          ok: false,
+          error: `User with this email already exists.`
+        }
+      }
+      console.log(JSON.stringify(error))
+      return {
+        ok: false,
+        error: "Cannot create user."
+      }
+    }
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async login ({ email, password }: LoginDto): Promise<LoginOutput> {
+    try {
+      const user = await this.usersRepository.findOne({ email }, { select: ['email', 'password'] });
+      if (!user) {
+        return {
+          ok: false,
+          error: "Invalid email / password"
+        }
+      }
+      if (!await user.checkPassword(password)) {
+        return {
+          ok: false,
+          error: "Invalid email / password."
+        }
+      }
+      // generate token
+      const loggedInUser = await this.usersRepository.findOne({ email });
+      const token = await this.jwtService.sign(loggedInUser.id);
+      return {
+        ok: true,
+        user: loggedInUser,
+        token,
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error: "Login Failed."
+      }
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findAll (): Promise<GetUsersOutput> {
+    try {
+      const users = await this.usersRepository.find();
+      return {
+        ok: true,
+        users
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error: "Cannot get all users."
+      }
+    }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findOne ({ id }: GetUserDto): Promise<GetUserOutput> {
+    try {
+      const user = await this.usersRepository.findOne({ id });
+      return {
+        ok: true,
+        user
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error: "Cannot get all users."
+      }
+    }
   }
 
-  remove(id: number) {
+  async update (id: number, updateUserDto: UpdateUserDto): Promise<UpdateUserOutput> {
+    try {
+      let user = await this.usersRepository.findOne({ id });
+      if (!user) {
+        return {
+          ok: false,
+          error: "User not found",
+        }
+      }
+      await this.usersRepository.update(id, updateUserDto);
+      user = await this.usersRepository.findOne({ id });
+      return {
+        ok: true,
+        user
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error: "Cannot get all users."
+      }
+    }
+  }
+
+  remove (id: number) {
     return `This action removes a #${id} user`;
   }
 }
