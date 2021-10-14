@@ -2,11 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
+import { ChangePasswordDto, changePasswordOutput } from './dto/change-password.dto';
 import { CreateUserDto, CreateUserOutput } from './dto/create-user.dto';
 import { DeleteUserOutput } from './dto/delete-user.dto';
 import { GetUserDto, GetUserOutput } from './dto/get-user.dto';
 import { GetUsersOutput } from './dto/get-users.dto';
 import { LoginDto, LoginOutput } from './dto/login.dto';
+import { MyProfileOutput } from './dto/my-profile.dto';
 import { UpdateUserDto, UpdateUserOutput } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
@@ -121,6 +123,60 @@ export class UserService {
       return {
         ok: false,
         error: "Cannot update users."
+      }
+    }
+  }
+
+  async changePassword ({ oldPassword, newPassword }: ChangePasswordDto, authUser: User): Promise<changePasswordOutput> {
+    try {
+      const { id } = authUser;
+      let user = await this.usersRepository.findOne({ id }, { select: ['password'] });
+      if (!user) {
+        return {
+          ok: false,
+          error: "User not found",
+        }
+      }
+      const isPasswordCorrect = await user.checkPassword(oldPassword);
+      if (!isPasswordCorrect) {
+        return {
+          ok: false,
+          error: "Invalid Credentials",
+        }
+      }
+      user = await this.usersRepository.findOne({ id });
+      user.password = newPassword;
+      await this.usersRepository.save(user);
+      return {
+        ok: true,
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: "Cannot change password."
+      }
+    }
+  }
+
+  async myProfile ({ id }: User): Promise<MyProfileOutput> {
+    try {
+      const user = await this.usersRepository.findOne({ id });
+      if (!user) {
+        return {
+          ok: false,
+          error: "Profile not found"
+        }
+      }
+      console.log(user)
+      return {
+        ok: true,
+        user
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        error: "Cannot get user."
       }
     }
   }
