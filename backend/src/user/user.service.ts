@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
 import { CreateUserDto, CreateUserOutput } from './dto/create-user.dto';
+import { DeleteUserOutput } from './dto/delete-user.dto';
 import { GetUserDto, GetUserOutput } from './dto/get-user.dto';
 import { GetUsersOutput } from './dto/get-users.dto';
 import { LoginDto, LoginOutput } from './dto/login.dto';
@@ -32,7 +33,6 @@ export class UserService {
           error: `User with this email already exists.`
         }
       }
-      console.log(JSON.stringify(error))
       return {
         ok: false,
         error: "Cannot create user."
@@ -96,13 +96,14 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error: "Cannot get all users."
+        error: "Cannot get user."
       }
     }
   }
 
-  async update (id: number, updateUserDto: UpdateUserDto): Promise<UpdateUserOutput> {
+  async update (updateUserDto: UpdateUserDto, authUser: User): Promise<UpdateUserOutput> {
     try {
+      const { id } = authUser;
       let user = await this.usersRepository.findOne({ id });
       if (!user) {
         return {
@@ -119,12 +120,31 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error: "Cannot get all users."
+        error: "Cannot update users."
       }
     }
   }
 
-  remove (id: number) {
-    return `This action removes a #${id} user`;
+  async remove (authUser: User): Promise<DeleteUserOutput> {
+    try {
+      const { id } = authUser;
+      const user = await this.usersRepository.findOne({ id });
+      if (!user) {
+        return {
+          ok: false,
+          error: "User not found",
+        }
+      }
+      await this.usersRepository.delete({ id });
+      return {
+        ok: true,
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: "Cannot delete users."
+      }
+    }
   }
 }
