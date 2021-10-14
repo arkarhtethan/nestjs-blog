@@ -2,13 +2,13 @@ import { InternalServerErrorException } from "@nestjs/common";
 import { Type } from "class-transformer";
 import { IsEmail, IsEnum, IsString, MinLength } from "class-validator";
 import { CoreEntity } from "src/common/entities/core.entity";
-import { BeforeInsert, BeforeUpdate, Column, Entity } from "typeorm"
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from "typeorm"
 import * as bcrypt from 'bcryptjs';
+import { Post } from "src/post/entities/post.entity";
 
 export enum UserRole {
-    Client = 'Client',
-    Owner = 'Owner',
-    Delivery = 'Delivery',
+    User = 'User',
+    Admin = 'Admin',
 }
 
 @Entity()
@@ -42,6 +42,9 @@ export class User extends CoreEntity {
     @Column({ type: 'enum', enum: UserRole })
     @IsEnum(UserRole)
     role: UserRole;
+
+    @OneToMany(() => Post, posts => posts.user)
+    posts: Post[];
 
     @BeforeInsert()
     async createUsername () {
