@@ -87,7 +87,6 @@ export class PostService {
       post = await this.postsRepository.findOne({ id });
       return { ok: true, post };
     } catch (error) {
-      console.log(error)
       return {
         ok: false,
         error: 'Cannot update post.',
