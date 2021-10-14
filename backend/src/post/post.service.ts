@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto, CreatePostOutput } from './dto/create-post.dto';
 import { DeletePostDTO } from './dto/delete-post.dot';
@@ -15,9 +16,9 @@ export class PostService {
     private readonly postsRepository: Repository<Post>,
   ) { }
 
-  async create (createPostDto: CreatePostDto): Promise<CreatePostOutput> {
+  async create (createPostDto: CreatePostDto, user: User): Promise<CreatePostOutput> {
     try {
-      const post = await this.postsRepository.create(createPostDto);
+      const post = await this.postsRepository.create({ ...createPostDto, user });
       await this.postsRepository.save(post);
       return {
         post,
@@ -71,9 +72,10 @@ export class PostService {
   async update (
     id: number,
     updatePostDto: UpdatePostDto,
+    user: User,
   ): Promise<UpdatePostOutput> {
     try {
-      let post = await this.postsRepository.findOne({ id });
+      let post = await this.postsRepository.findOne({ id, user });
       if (!post) {
         return {
           ok: false,
@@ -85,6 +87,7 @@ export class PostService {
       post = await this.postsRepository.findOne({ id });
       return { ok: true, post };
     } catch (error) {
+      console.log(error)
       return {
         ok: false,
         error: 'Cannot update post.',
@@ -92,16 +95,15 @@ export class PostService {
     }
   }
 
-  async remove ({ id }: DeletePostDTO): Promise<UpdatePostOutput> {
+  async remove ({ id }: DeletePostDTO, user: User): Promise<UpdatePostOutput> {
     try {
-      const post = await this.postsRepository.findOne({ id });
+      const post = await this.postsRepository.findOne({ id, user });
       if (!post) {
         return {
           ok: false,
           error: 'Post not found',
         };
       }
-      //TODO: check ownership
       await this.postsRepository.delete({ id });
       return {
         ok: true,
