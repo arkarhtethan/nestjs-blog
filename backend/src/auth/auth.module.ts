@@ -8,7 +8,6 @@ import { AuthGuard } from './auth.guard';
         UserModule,
     ],
     providers: [
-
         {
             provide: APP_GUARD,
             useClass: AuthGuard,
