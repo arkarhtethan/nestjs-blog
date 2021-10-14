@@ -4,9 +4,10 @@ import { PostModule } from './post/post.module';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from './post/entities/post.entity';
-
-console.log(process.env.NODE_ENV)
-
+import { UserModule } from './user/user.module';
+import { User } from './user/entities/user.entity';
+import { JwtModule } from './jwt/jwt.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,11 +16,12 @@ console.log(process.env.NODE_ENV)
         NODE_ENV: Joi.string()
           .valid('dev', 'production', 'test')
           .required(),
-        DB_HOST: Joi.string(),
+        PRIVATE_KEY: Joi.string().required(),
+        DB_HOST: Joi.string().required(),
         DB_PORT: Joi.string(),
-        DB_USERNAME: Joi.string(),
-        DB_PASSWORD: Joi.string(),
-        DB_NAME: Joi.string(),
+        DB_USERNAME: Joi.string().required(),
+        DB_PASSWORD: Joi.string().required(),
+        DB_NAME: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -28,10 +30,13 @@ console.log(process.env.NODE_ENV)
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [Post],
+      entities: [Post, User],
       synchronize: true,
     }),
-    PostModule
+    PostModule,
+    UserModule,
+    JwtModule.forRoot({ privateKey: process.env.PRIVATE_KEY }),
+    AuthModule,
   ],
 })
 export class AppModule { }
