@@ -1,8 +1,9 @@
 /* eslint-disable prettier/prettier */
 import { CoreEntity } from "src/common/entities/core.entity";
-import { BeforeInsert, Column, Entity } from "typeorm";
+import { BeforeInsert, Column, Entity, ManyToOne } from "typeorm";
 import { IsString } from 'class-validator';
 import { Type } from 'class-transformer';
+import { User } from "src/user/entities/user.entity";
 
 @Entity()
 export class Post extends CoreEntity {
@@ -24,6 +25,9 @@ export class Post extends CoreEntity {
     @IsString()
     @Type(() => String)
     coverImage: string;
+
+    @ManyToOne(() => User, user => user.posts, { nullable: false })
+    user: User;
 
     @BeforeInsert()
     generateSlug () {
