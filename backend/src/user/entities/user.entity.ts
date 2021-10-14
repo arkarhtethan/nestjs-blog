@@ -48,7 +48,9 @@ export class User extends CoreEntity {
 
     @BeforeInsert()
     async createUsername () {
-        this.username = `${this.name.toLocaleLowerCase().replace(/ /g, '')}${Date.now()}`
+        if (this.name) {
+            this.username = `${this.name.toLocaleLowerCase().replace(/ /g, '')}${Date.now()}`
+        }
     }
 
     @BeforeInsert()
