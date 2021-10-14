@@ -42,10 +42,9 @@ export class UserController {
     return this.userService.update(updateUserDto, user);
   }
 
-  @Delete(':id')
+  @Delete()
   @Role(['User'])
-  remove (@Param('id') id: string,
-    @AuthUser() user: User) {
+  remove (@AuthUser() user: User) {
     return this.userService.remove(user);
   }
 }
