@@ -8,18 +8,61 @@ import { GetPostDTO, GetPostOutput } from './dto/get-post.dto';
 import { GetPostsOutput } from './dto/get-posts.dto';
 import { MyPostOutput } from './dto/my-post.dto';
 import { UpdatePostDto, UpdatePostOutput } from './dto/update-post.dto';
+import { Category } from './entities/category.entity';
 import { Post } from './entities/post.entity';
+import { Tag } from './entities/tag.entity';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
+    @InjectRepository(Tag)
+    private readonly tagsRepository: Repository<Tag>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
   ) { }
+
+  private async getTagOrCreate (name: string) {
+    let tagObject = await this.tagsRepository.findOne({ name })
+    if (!tagObject) {
+      tagObject = await this.tagsRepository.create({ name })
+      await this.tagsRepository.save(tagObject)
+    }
+    return tagObject;
+  }
+
+  private async getCategoryOrCreate (name: string) {
+    let categoryObjectToInsert = await this.categoryRepository.findOne({ name });
+    if (!categoryObjectToInsert) {
+      const createdCategory = await this.categoryRepository.create({ name });
+      await this.categoryRepository.save(createdCategory);
+      categoryObjectToInsert = createdCategory;
+    }
+    return categoryObjectToInsert;
+  }
 
   async create (createPostDto: CreatePostDto, user: User): Promise<CreatePostOutput> {
     try {
-      const post = await this.postsRepository.create({ ...createPostDto, user });
+
+      const { tags, category } = createPostDto;
+
+      // -------------- start category ------------------
+      // find cateogry, if not exists create one
+      let categoryObjectToInsert: Category = await this.getCategoryOrCreate(category);
+
+      // -------------- done category ------------------
+
+      // -------------- start tag ------------------
+      let tagsToInsert: Tag[] = [];
+      for (let tag of tags) {
+        let tagObject = await this.getTagOrCreate(tag);
+        let savedTag = await this.tagsRepository.save(tagObject)
+        tagsToInsert.push(savedTag);
+      }
+      // -------------- done tag ------------------
+
+      const post = await this.postsRepository.create({ ...createPostDto, user, tags: tagsToInsert, category: categoryObjectToInsert });
       await this.postsRepository.save(post);
       return {
         post,
@@ -84,7 +127,7 @@ export class PostService {
         };
       }
       // check ownership
-      await this.postsRepository.update(id, updatePostDto);
+      // await this.postsRepository.update(id, updatePostDto);
       post = await this.postsRepository.findOne({ id });
       return { ok: true, post };
     } catch (error) {
