@@ -94,7 +94,7 @@ export class PostService {
 
   async findOne (getPostDto: GetPostDTO): Promise<GetPostOutput> {
     try {
-      const post = await this.postsRepository.findOne({ id: getPostDto.id });
+      const post = await this.postsRepository.findOne({ id: getPostDto.id }, { relations: ['tags'] });
       if (!post) {
         return {
           ok: false,
@@ -119,18 +119,53 @@ export class PostService {
     user: User,
   ): Promise<UpdatePostOutput> {
     try {
-      let post = await this.postsRepository.findOne({ id, user });
+      let post = await this.postsRepository.findOne({ id, user }, { relations: ['category', 'tags'] });
       if (!post) {
         return {
           ok: false,
           error: 'Post not found',
         };
       }
-      // check ownership
-      // await this.postsRepository.update(id, updatePostDto);
+      const { tags: newTags, category: newCategory } = updatePostDto;
+      const { tags: oldTags, category: oldCategory } = post;
+
+      let newCategoryToInsert: Category;
+      let newTagsToInsert: Tag[] = [];
+
+      delete updatePostDto.category
+      delete updatePostDto.tags;
+
+      if (newCategory) {
+        if (oldCategory.name !== newCategory) {
+          newCategoryToInsert = await this.getCategoryOrCreate(newCategory);
+        }
+      }
+
+      if (newTags && newTags.length > 0) {
+        //1. extract new added tag
+        const transformedOldTags = oldTags.map(tag => tag.name);
+        const newlyAddedTags = newTags.filter(tag => !transformedOldTags.includes(tag))
+        newTagsToInsert = [...oldTags]
+        //2. create tag if not exists
+        for (let newTag of newlyAddedTags) {
+          const tagObject: Tag = await this.getTagOrCreate(newTag);
+          newTagsToInsert.push(tagObject);
+        }
+      }
+
+      if (newTagsToInsert.length > 0) {
+        post.tags = newTagsToInsert;
+      }
+
+      if (newCategoryToInsert) {
+        post.category = newCategoryToInsert;
+      }
+
+      await this.postsRepository.save(post);
       post = await this.postsRepository.findOne({ id });
       return { ok: true, post };
     } catch (error) {
+      console.log(error);
       return {
         ok: false,
         error: 'Cannot update post.',
@@ -158,7 +193,6 @@ export class PostService {
       };
     }
   }
-
 
   async remove ({ id }: DeletePostDTO, user: User): Promise<UpdatePostOutput> {
     try {
