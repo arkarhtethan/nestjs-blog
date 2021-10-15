@@ -94,6 +94,28 @@ export class PostService {
     }
   }
 
+  async myPost (user: User) {
+    try {
+      const posts = await this.postsRepository.find({ user });
+      if (!posts) {
+        return {
+          ok: false,
+          error: 'Post not found',
+        };
+      }
+      return {
+        ok: true,
+        posts,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: "Can't get mypost.",
+      };
+    }
+  }
+
+
   async remove ({ id }: DeletePostDTO, user: User): Promise<UpdatePostOutput> {
     try {
       const post = await this.postsRepository.findOne({ id, user });
