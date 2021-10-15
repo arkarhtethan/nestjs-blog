@@ -1,7 +1,8 @@
 import { Type } from "class-transformer";
 import { IsString } from "class-validator";
 import { CoreEntity } from "src/common/entities/core.entity";
-import { BeforeInsert, Column, Entity } from "typeorm";
+import { BeforeInsert, Column, Entity, ManyToMany } from "typeorm";
+import { Post } from "./post.entity";
 
 @Entity()
 export class Tag extends CoreEntity {
@@ -15,6 +16,9 @@ export class Tag extends CoreEntity {
     @IsString()
     @Type(() => String)
     slug: string;
+
+    @ManyToMany(() => Post, posts => posts.tags)
+    posts: Post[];
 
     @BeforeInsert()
     createSlug () {
