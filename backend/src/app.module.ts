@@ -8,6 +8,8 @@ import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
+import { Category } from './post/entities/category.entity';
+import { Tag } from './post/entities/tag.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,7 +32,7 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [Post, User],
+      entities: [Post, User, Category, Tag],
       synchronize: true,
     }),
     PostModule,
