@@ -6,6 +6,7 @@ import { CreatePostDto, CreatePostOutput } from './dto/create-post.dto';
 import { DeletePostDTO } from './dto/delete-post.dot';
 import { GetPostDTO, GetPostOutput } from './dto/get-post.dto';
 import { GetPostsOutput } from './dto/get-posts.dto';
+import { MyPostOutput } from './dto/my-post.dto';
 import { UpdatePostDto, UpdatePostOutput } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 
@@ -94,7 +95,7 @@ export class PostService {
     }
   }
 
-  async myPost (user: User) {
+  async myPost (user: User): Promise<MyPostOutput> {
     try {
       const posts = await this.postsRepository.find({ user });
       if (!posts) {
