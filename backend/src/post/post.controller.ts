@@ -15,6 +15,7 @@ import { DeletePostDTO } from './dto/delete-post.dot';
 import { Role } from 'src/auth/role.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { MyPostOutput } from './dto/my-post.dto';
 
 @Controller('post')
 export class PostController {
@@ -31,6 +32,14 @@ export class PostController {
     return this.postService.findAll();
   }
 
+  @Get('mypost')
+  @Role(['User'])
+  myPost (
+    @AuthUser() user: User
+  ): Promise<MyPostOutput> {
+    return this.postService.myPost(user);
+  }
+
   @Get(':id')
   findOne (@Param() getPostDTO: GetPostDTO) {
     return this.postService.findOne(getPostDTO);
@@ -45,6 +54,7 @@ export class PostController {
   ) {
     return this.postService.update(+id, updatePostDto, user);
   }
+
 
   @Delete(':id')
   @Role(['User'])
