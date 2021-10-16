@@ -4,6 +4,8 @@ import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto, CreatePostOutput } from './dto/create-post.dto';
 import { DeletePostDTO } from './dto/delete-post.dot';
+import { GetPostByCategoryDto, GetPostByCategoryOutput } from './dto/get-post-by-category.dto';
+import { GetPostByTagDto, GetPostByTagOutput } from './dto/get-post-by-tag.dto';
 import { GetPostDTO, GetPostOutput } from './dto/get-post.dto';
 import { GetPostsOutput } from './dto/get-posts.dto';
 import { MyPostOutput } from './dto/my-post.dto';
@@ -110,6 +112,54 @@ export class PostService {
         ok: false,
         error: "Can't get post.",
       };
+    }
+  }
+
+  async postByCategory (
+    { slug }: GetPostByCategoryDto
+  ): Promise<GetPostByCategoryOutput> {
+    try {
+      const category = await this.categoryRepository.findOne({ slug }, { relations: ['posts'] })
+      if (!category) {
+        return {
+          ok: false,
+          error: "Category not found."
+        }
+      }
+      return {
+        ok: true,
+        posts: category.posts
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: "Can't get post by given category."
+      }
+    }
+  }
+
+  async postByTag (
+    { slug }: GetPostByTagDto
+  ): Promise<GetPostByTagOutput> {
+    try {
+      const tag = await this.tagsRepository.findOne({ slug }, { relations: ['posts'] })
+      if (!tag) {
+        return {
+          ok: false,
+          error: "Tag not found."
+        }
+      }
+      return {
+        ok: true,
+        posts: tag.posts
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: "Can't get post by given tag."
+      }
     }
   }
 
