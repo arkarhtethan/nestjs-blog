@@ -34,8 +34,18 @@ export class Post extends CoreEntity {
     @ManyToOne(() => Category, category => category.posts, { onDelete: "SET NULL" })
     category: Category;
 
-    @ManyToMany(() => Tag)
-    @JoinTable()
+    @ManyToMany(() => Tag, tag => tag.posts)
+    @JoinTable({
+        name: "post_post_tag_id",
+        joinColumn: {
+            name: "post",
+            referencedColumnName: "id"
+        },
+        inverseJoinColumn: {
+            name: "tag",
+            referencedColumnName: "id"
+        }
+    })
     tags: Tag[];
 
     @BeforeInsert()
