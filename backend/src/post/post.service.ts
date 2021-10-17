@@ -5,10 +5,10 @@ import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto, CreatePostOutput } from './dto/create-post.dto';
 import { DeletePostDTO } from './dto/delete-post.dot';
-import { GetPostByCategoryDto, GetPostByCategoryOutput } from './dto/get-post-by-category.dto';
+import { GetPostByCategoryParamDto, GetPostByCategoryOutput, GetPostByCateogryQueryDto } from './dto/get-post-by-category.dto';
 import { GetPostByTagDto, GetPostByTagOutput } from './dto/get-post-by-tag.dto';
 import { GetPostDTO, GetPostOutput } from './dto/get-post.dto';
-import { GetPostsInput, GetPostsOutput } from './dto/get-posts.dto';
+import { GetPostsQueryInput, GetPostsOutput } from './dto/get-posts.dto';
 import { MyPostOutput } from './dto/my-post.dto';
 import { UpdatePostDto, UpdatePostOutput } from './dto/update-post.dto';
 import { Category } from './entities/category.entity';
@@ -133,20 +133,46 @@ export class PostService {
   }
 
   async postByCategory (
-    { slug }: GetPostByCategoryDto
+    { slug }: GetPostByCategoryParamDto,
+    getPostByCateogryQueryDto: GetPostByCateogryQueryDto,
   ): Promise<GetPostByCategoryOutput> {
     try {
-      const category = await this.categoryRepository.findOne({ slug }, { relations: ['posts'] })
+      const category = await this.categoryRepository.findOne({ slug })
       if (!category) {
         return {
           ok: false,
           error: "Category not found."
         }
       }
+
+      const { pageNumber = DEFAULT_PAGE_NUMBER, limit = DEFAULT_POSTS_PER_PAGE } = getPostByCateogryQueryDto;
+
+      const totalPosts = await this.postsRepository.count({
+        where: {
+          category,
+        },
+      });
+
+      const posts = await this.postsRepository.find({
+        where: {
+          category,
+        },
+        take: limit,
+        skip: (pageNumber * limit - limit),
+      })
+
+      const totalPages = Math.ceil(totalPosts / limit);
+
       return {
         ok: true,
-        posts: category.posts
+        data: {
+          posts,
+          count: limit,
+          currentPage: pageNumber,
+          pages: totalPages,
+        }
       }
+
     } catch (error) {
       console.log(error);
       return {
