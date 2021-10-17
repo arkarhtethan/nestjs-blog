@@ -17,9 +17,9 @@ import { Role } from 'src/auth/role.decorator';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { MyPostOutput } from './dto/my-post.dto';
-import { GetPostByCategoryDto, GetPostByCategoryOutput } from './dto/get-post-by-category.dto';
+import { GetPostByCategoryParamDto, GetPostByCategoryOutput, GetPostByCateogryQueryDto } from './dto/get-post-by-category.dto';
 import { GetPostByTagDto, GetPostByTagOutput } from './dto/get-post-by-tag.dto';
-import { GetPostsInput, GetPostsOutput } from './dto/get-posts.dto';
+import { GetPostsQueryInput, GetPostsOutput } from './dto/get-posts.dto';
 
 @Controller('post')
 export class PostController {
@@ -46,9 +46,10 @@ export class PostController {
 
   @Get('category/:slug')
   postByCategory (
-    @Param() postByCategoryDto: GetPostByCategoryDto
+    @Param() postByCategoryDto: GetPostByCategoryParamDto,
+    @Query() getPostByCateogryQueryDto: GetPostByCateogryQueryDto,
   ): Promise<GetPostByCategoryOutput> {
-    return this.postService.postByCategory(postByCategoryDto);
+    return this.postService.postByCategory(postByCategoryDto, getPostByCateogryQueryDto);
   }
 
   @Get('tag/:slug')
