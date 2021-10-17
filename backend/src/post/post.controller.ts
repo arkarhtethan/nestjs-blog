@@ -32,7 +32,7 @@ export class PostController {
   }
 
   @Get()
-  async findAll (@Query() getPostsInput: GetPostsInput): Promise<GetPostsOutput> {
+  async findAll (@Query() getPostsInput: GetPostsQueryInput): Promise<GetPostsOutput> {
     return await this.postService.findAll(getPostsInput);
   }
 
