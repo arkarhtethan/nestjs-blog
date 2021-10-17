@@ -18,7 +18,7 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { MyPostOutput } from './dto/my-post.dto';
 import { GetPostByCategoryParamDto, GetPostByCategoryOutput, GetPostByCateogryQueryDto } from './dto/get-post-by-category.dto';
-import { GetPostByTagDto, GetPostByTagOutput } from './dto/get-post-by-tag.dto';
+import { GetPostByTagParamDto, GetPostByTagOutput, GetPostByTagQueryInput } from './dto/get-post-by-tag.dto';
 import { GetPostsQueryInput, GetPostsOutput } from './dto/get-posts.dto';
 
 @Controller('post')
@@ -54,9 +54,10 @@ export class PostController {
 
   @Get('tag/:slug')
   postByTag (
-    @Param() postByTagDto: GetPostByTagDto
+    @Param() postByTagDto: GetPostByTagParamDto,
+    @Query() getPostByTagQueryInput: GetPostByTagQueryInput
   ): Promise<GetPostByTagOutput> {
-    return this.postService.postByTag(postByTagDto);
+    return this.postService.postByTag(postByTagDto, getPostByTagQueryInput);
   }
 
 
