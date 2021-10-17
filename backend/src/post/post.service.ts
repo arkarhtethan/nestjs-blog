@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { CreatePostDto, CreatePostOutput } from './dto/create-post.dto';
 import { DeletePostDTO } from './dto/delete-post.dot';
 import { GetPostByCategoryParamDto, GetPostByCategoryOutput, GetPostByCateogryQueryDto } from './dto/get-post-by-category.dto';
-import { GetPostByTagDto, GetPostByTagOutput } from './dto/get-post-by-tag.dto';
+import { GetPostByTagParamDto, GetPostByTagOutput, GetPostByTagQueryInput } from './dto/get-post-by-tag.dto';
 import { GetPostDTO, GetPostOutput } from './dto/get-post.dto';
 import { GetPostsQueryInput, GetPostsOutput } from './dto/get-posts.dto';
 import { MyPostOutput } from './dto/my-post.dto';
@@ -183,22 +183,43 @@ export class PostService {
   }
 
   async postByTag (
-    { slug }: GetPostByTagDto
+    { slug }: GetPostByTagParamDto,
+    { pageNumber = DEFAULT_PAGE_NUMBER, limit = DEFAULT_POSTS_PER_PAGE }:
+      GetPostByTagQueryInput,
   ): Promise<GetPostByTagOutput> {
     try {
-      const tag = await this.tagsRepository.findOne({ slug }, { relations: ['posts'] })
+
+      const tag = await this.tagsRepository.findOne({ slug }, { select: ['id'] })
+
       if (!tag) {
         return {
           ok: false,
           error: "Tag not found."
         }
       }
+
+      const postsQuery = await this.postsRepository.createQueryBuilder('post')
+        .innerJoin('post.tags', 'postTags')
+        .where(`postTags.id=${tag.id}`);
+
+      const totalPosts = await postsQuery.getCount();
+
+      const posts = await postsQuery.take(limit)
+        .skip(pageNumber * limit - limit)
+        .getMany();
+
+      const totalPages = Math.ceil(totalPosts / limit);
+
       return {
         ok: true,
-        posts: tag.posts
+        data: {
+          posts,
+          count: limit,
+          currentPage: pageNumber,
+          pages: totalPages,
+        }
       }
     } catch (error) {
-      console.log(error);
       return {
         ok: false,
         error: "Can't get post by given tag."
