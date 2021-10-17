@@ -80,15 +80,15 @@ export class PostService {
     }
   }
 
-  async findAll (getPostsInput: GetPostsInput): Promise<GetPostsOutput> {
+  async findAll (getPostsInput: GetPostsQueryInput): Promise<GetPostsOutput> {
     try {
       // default page number is one if it's not provided
-      const { pageNumber = 1, limit = 10 } = getPostsInput;
+      const { pageNumber = DEFAULT_PAGE_NUMBER, limit = DEFAULT_POSTS_PER_PAGE } = getPostsInput;
 
       const totalPosts = await this.postsRepository.count();
 
       const posts = await this.postsRepository.find({
-        take: limit || DEFAULT_POSTS_PER_PAGE,
+        take: limit,
         skip: (pageNumber * limit - limit),
       });
 
@@ -99,7 +99,7 @@ export class PostService {
           posts,
           pages: totalPages,
           count: limit,
-          currentPage: pageNumber || DEFAULT_PAGE_NUMBER,
+          currentPage: pageNumber,
         },
         ok: true,
       };
