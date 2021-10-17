@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -18,6 +19,7 @@ import { User } from 'src/user/entities/user.entity';
 import { MyPostOutput } from './dto/my-post.dto';
 import { GetPostByCategoryDto, GetPostByCategoryOutput } from './dto/get-post-by-category.dto';
 import { GetPostByTagDto, GetPostByTagOutput } from './dto/get-post-by-tag.dto';
+import { GetPostsInput, GetPostsOutput } from './dto/get-posts.dto';
 
 @Controller('post')
 export class PostController {
@@ -30,8 +32,8 @@ export class PostController {
   }
 
   @Get()
-  findAll () {
-    return this.postService.findAll();
+  async findAll (@Query() getPostsInput: GetPostsInput): Promise<GetPostsOutput> {
+    return await this.postService.findAll(getPostsInput);
   }
 
   @Get('mypost')
