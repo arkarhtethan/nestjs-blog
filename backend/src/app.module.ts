@@ -10,6 +10,7 @@ import { JwtModule } from './jwt/jwt.module';
 import { AuthModule } from './auth/auth.module';
 import { Category } from './post/entities/category.entity';
 import { Tag } from './post/entities/tag.entity';
+import { SearchModule } from './search/search.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -39,6 +40,7 @@ import { Tag } from './post/entities/tag.entity';
     UserModule,
     JwtModule.forRoot({ privateKey: process.env.PRIVATE_KEY }),
     AuthModule,
+    SearchModule,
   ],
 })
 export class AppModule { }
