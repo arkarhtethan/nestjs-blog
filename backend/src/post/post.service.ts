@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DEFAULT_PAGE_NUMBER, DEFAULT_POSTS_PER_PAGE } from 'src/common/constants';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto, CreatePostOutput } from './dto/create-post.dto';
@@ -7,7 +8,7 @@ import { DeletePostDTO } from './dto/delete-post.dot';
 import { GetPostByCategoryDto, GetPostByCategoryOutput } from './dto/get-post-by-category.dto';
 import { GetPostByTagDto, GetPostByTagOutput } from './dto/get-post-by-tag.dto';
 import { GetPostDTO, GetPostOutput } from './dto/get-post.dto';
-import { GetPostsOutput } from './dto/get-posts.dto';
+import { GetPostsInput, GetPostsOutput } from './dto/get-posts.dto';
 import { MyPostOutput } from './dto/my-post.dto';
 import { UpdatePostDto, UpdatePostOutput } from './dto/update-post.dto';
 import { Category } from './entities/category.entity';
@@ -79,11 +80,27 @@ export class PostService {
     }
   }
 
-  async findAll (): Promise<GetPostsOutput> {
+  async findAll (getPostsInput: GetPostsInput): Promise<GetPostsOutput> {
     try {
-      const posts = await this.postsRepository.find();
+      // default page number is one if it's not provided
+      const { pageNumber = 1, limit = 10 } = getPostsInput;
+
+      const totalPosts = await this.postsRepository.count();
+
+      const posts = await this.postsRepository.find({
+        take: limit || DEFAULT_POSTS_PER_PAGE,
+        skip: (pageNumber * limit - limit),
+      });
+
+      const totalPages = Math.ceil(totalPosts / limit);
+
       return {
-        posts,
+        data: {
+          posts,
+          pages: totalPages,
+          count: limit,
+          currentPage: pageNumber || DEFAULT_PAGE_NUMBER,
+        },
         ok: true,
       };
     } catch (error) {
