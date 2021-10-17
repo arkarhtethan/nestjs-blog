@@ -3,7 +3,7 @@ import { IsString } from "class-validator";
 import { CoreOutput } from "src/common/dtos/core.output";
 import { Post } from "../entities/post.entity";
 
-export class GetPostByTagDto {
+export class GetPostByTagParamDto {
     @IsString()
     @Type(() => String)
     slug: string;
