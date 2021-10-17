@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CONFIG_OPTIONS } from 'src/common/common.constant';
+import { CONFIG_OPTIONS } from 'src/common/constants';
 import { JwtService } from './jwt.service';
 import * as jwt from "jsonwebtoken";
 
