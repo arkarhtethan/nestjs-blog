@@ -4,10 +4,10 @@ import { DEFAULT_PAGE_NUMBER, DEFAULT_POSTS_PER_PAGE } from 'src/common/constant
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto, CreatePostOutput } from './dto/create-post.dto';
-import { DeletePostDTO } from './dto/delete-post.dot';
+import { DeletePostOutput, DeletePostParamDTO } from './dto/delete-post.dot';
 import { GetPostByCategoryParamDto, GetPostByCategoryOutput, GetPostByCateogryQueryDto } from './dto/get-post-by-category.dto';
 import { GetPostByTagParamDto, GetPostByTagOutput, GetPostByTagQueryInput } from './dto/get-post-by-tag.dto';
-import { GetPostDTO, GetPostOutput } from './dto/get-post.dto';
+import { GetPostParamDTO, GetPostOutput } from './dto/get-post.dto';
 import { GetPostsQueryInput, GetPostsOutput } from './dto/get-posts.dto';
 import { MyPostOutput } from './dto/my-post.dto';
 import { UpdatePostDto, UpdatePostOutput } from './dto/update-post.dto';
@@ -111,9 +111,9 @@ export class PostService {
     }
   }
 
-  async findOne (getPostDto: GetPostDTO): Promise<GetPostOutput> {
+  async findOne (getPostParamDto: GetPostParamDTO): Promise<GetPostOutput> {
     try {
-      const post = await this.postsRepository.findOne({ id: getPostDto.id }, { relations: ['tags'] });
+      const post = await this.postsRepository.findOne({ id: getPostParamDto.id }, { relations: ['tags'] });
       if (!post) {
         return {
           ok: false,
@@ -308,7 +308,7 @@ export class PostService {
     }
   }
 
-  async remove ({ id }: DeletePostDTO, user: User): Promise<UpdatePostOutput> {
+  async remove ({ id }: DeletePostParamDTO, user: User): Promise<DeletePostOutput> {
     try {
       const post = await this.postsRepository.findOne({ id, user });
       if (!post) {

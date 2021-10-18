@@ -3,15 +3,19 @@ import { IsString } from "class-validator";
 import { CoreEntity } from "src/common/entities/core.entity";
 import { BeforeInsert, Column, Entity, OneToMany } from "typeorm";
 import { Post } from "./post.entity";
+import { ApiProperty } from "@nestjs/swagger";
+
 
 @Entity()
 export class Category extends CoreEntity {
 
+    @ApiProperty()
     @Column({ nullable: false, unique: true })
     @IsString()
     @Type(() => String)
     name: string;
 
+    @ApiProperty()
     @Column({ nullable: false, unique: true })
     @IsString()
     @Type(() => String)

@@ -6,10 +6,12 @@ import { Type } from 'class-transformer';
 import { User } from "src/user/entities/user.entity";
 import { Category } from "./category.entity";
 import { Tag } from "./tag.entity";
+import { ApiProperty } from "@nestjs/swagger";
 
 @Entity()
 export class Post extends CoreEntity {
 
+    @ApiProperty({ description: "Title of the post", example: "Learning NestJS" })
     @Column()
     @IsString()
     @Type(() => String)
@@ -18,11 +20,13 @@ export class Post extends CoreEntity {
     @Column()
     slug: string;
 
+    @ApiProperty({ description: "Description of the post", example: "This is sample description." })
     @Column('text')
     @IsString()
     @Type(() => String)
     description: string;
 
+    @ApiProperty({ description: "Please provide image url for cover image.", example: "https://www.example.com/somepic.png." })
     @Column()
     @IsString()
     @Type(() => String)
