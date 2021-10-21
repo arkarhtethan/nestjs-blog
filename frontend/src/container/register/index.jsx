@@ -1,17 +1,15 @@
 import React, { useState } from 'react'
 import { useForm } from "react-hook-form";
 import { Link } from 'react-router-dom';
-import FormError, { FormInputError } from '../../components/error/formError';
+import FormError, { ErrorMessage } from '../../components/error/formError';
 import { SubmitButton } from '../../components/submitButton';
 
 export const Register = () => {
     const { register, getValues, handleSubmit, formState: { errors } } = useForm({ mode: 'onChange' });
     const [loading, setLoading] = useState(false);
     const { email, password, name } = getValues();
-    console.log(errors);
     const onSubmit = () => {
         setLoading(true);
-        console.log(getValues());
     }
 
     const isValid = () => {
@@ -40,7 +38,7 @@ export const Register = () => {
                     placeholder="Name"
                     className="border-2 border-black p-2 md:mb-4 mb-8"
                 />
-                {errors.name && <FormInputError message={errors.name.message} />}
+                {errors.name && <ErrorMessage message={errors.name.message} />}
                 <input
                     {...register("email", {
                         required: {
@@ -56,7 +54,7 @@ export const Register = () => {
                     type="email"
                     className="border-2 border-black p-2 md:mb-4 mb-8 "
                 />
-                {errors.email && <FormInputError message={errors.email.message} />}
+                {errors.email && <ErrorMessage message={errors.email.message} />}
                 <input
                     {...register("password", {
                         required: {
@@ -71,7 +69,7 @@ export const Register = () => {
                     type="password"
                     className="border-2 border-black p-2 md:mb-4 mb-8 "
                 />
-                {errors.password && <FormInputError message={errors.password.message} />}
+                {errors.password && <ErrorMessage message={errors.password.message} />}
                 <SubmitButton buttonText="REGISTER" loading={loading} isValid={isValid()} />
                 <div className="flex text-gray-400">
                     <div className="h-4 border-gray-500 border-b-2 w-1/2"></div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useForm } from "react-hook-form";
 import { Link } from 'react-router-dom';
-import FormError, { FormInputError } from '../../components/error/formError';
+import FormError, { ErrorMessage } from '../../components/error/formError';
 import { SubmitButton } from '../../components/submitButton';
 
 export const Login = () => {
@@ -33,7 +33,7 @@ export const Login = () => {
                     })}
                     placeholder="user@example.com"
                     className="border-2 border-gray-500 p-2 md:mb-4" />
-                {errors.email && <FormInputError message={errors.email.message} />}
+                {errors.email && <ErrorMessage message={errors.email.message} />}
                 <input
                     {...register("password", {
                         minLength: {
@@ -45,7 +45,7 @@ export const Login = () => {
                     placeholder="*******"
                     className="border-2 border-gray-500 p-2 md:mb-4 mb-8"
                 />
-                {errors.password && <FormInputError message={errors.password.message} />}
+                {errors.password && <ErrorMessage message={errors.password.message} />}
                 {/* use in nromal design */}
                 <SubmitButton loading={loading} buttonText="Login" isValid={isValid()} />
                 {/* when sending request */}
