@@ -6,7 +6,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap () {
   const app = await NestFactory.create(AppModule);
-
+  app.enableCors();
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Blog API')
     .setDescription('This is a blog api with user authentication.')
