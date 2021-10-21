@@ -5,10 +5,12 @@ import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto, CreatePostOutput } from './dto/create-post.dto';
 import { DeletePostOutput, DeletePostParamDTO } from './dto/delete-post.dot';
+import { GetCategoriesOutput } from './dto/get-categories.dto';
 import { GetPostByCategoryParamDto, GetPostByCategoryOutput, GetPostByCateogryQueryDto } from './dto/get-post-by-category.dto';
 import { GetPostByTagParamDto, GetPostByTagOutput, GetPostByTagQueryInput } from './dto/get-post-by-tag.dto';
 import { GetPostParamDTO, GetPostOutput } from './dto/get-post.dto';
 import { GetPostsQueryInput, GetPostsOutput } from './dto/get-posts.dto';
+import { GetTagsOutput } from './dto/get-tags.dto';
 import { MyPostOutput } from './dto/my-post.dto';
 import { UpdatePostDto, UpdatePostOutput } from './dto/update-post.dto';
 import { Category } from './entities/category.entity';
@@ -325,6 +327,47 @@ export class PostService {
       return {
         ok: false,
         error: "Can't delete post.",
+      };
+    }
+  }
+
+  async getCategories (): Promise<GetCategoriesOutput> {
+    try {
+      const categories = await this.categoryRepository.find();
+      if (!categories) {
+        return {
+          ok: false,
+          error: 'Post not found',
+        };
+      }
+      return {
+        ok: true,
+        categories,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: "Can't get mypost.",
+      };
+    }
+  }
+  async getTags (): Promise<GetTagsOutput> {
+    try {
+      const tags = await this.tagsRepository.find();
+      if (!tags) {
+        return {
+          ok: false,
+          error: 'Post not found',
+        };
+      }
+      return {
+        ok: true,
+        tags,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: "Can't get mypost.",
       };
     }
   }

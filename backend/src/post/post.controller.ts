@@ -21,6 +21,8 @@ import { MyPostOutput } from './dto/my-post.dto';
 import { GetPostByCategoryParamDto, GetPostByCategoryOutput, GetPostByCateogryQueryDto } from './dto/get-post-by-category.dto';
 import { GetPostByTagParamDto, GetPostByTagOutput, GetPostByTagQueryInput } from './dto/get-post-by-tag.dto';
 import { GetPostsQueryInput, GetPostsOutput } from './dto/get-posts.dto';
+import { GetCategoriesOutput } from './dto/get-categories.dto';
+import { GetTagsOutput } from './dto/get-tags.dto';
 
 @ApiTags('Post')
 @Controller('post')
@@ -104,6 +106,30 @@ export class PostController {
   }
 
   @ApiOkResponse({
+    description: 'Get categories successfully',
+    type: DeletePostOutput,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  @Get('/categories')
+  async getCategories (): Promise<GetCategoriesOutput> {
+    return await this.postService.getCategories();
+  }
+
+  @ApiOkResponse({
+    description: 'Get tags successfully',
+    type: DeletePostOutput,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  @Get('/tags')
+  async getTags (): Promise<GetTagsOutput> {
+    return await this.postService.getTags();
+  }
+
+  @ApiOkResponse({
     description: 'Get single post for given id successfully',
     type: GetPostOutput,
   })
@@ -132,7 +158,6 @@ export class PostController {
   ): Promise<UpdatePostOutput> {
     return this.postService.update(+id, updatePostDto, user);
   }
-
 
   @ApiOkResponse({
     description: 'Deleted post successfully',
