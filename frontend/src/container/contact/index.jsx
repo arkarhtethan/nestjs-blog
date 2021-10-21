@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useForm } from "react-hook-form";
-import { Link } from 'react-router-dom';
-import FormError, { FormInputError } from '../../components/error/formError';
+import FormError, { ErrorMessage } from '../../components/error/formError';
 import { SubmitButton } from '../../components/submitButton';
 
 export const Contact = () => {
@@ -42,7 +41,7 @@ export const Contact = () => {
                             placeholder="Name"
                             className="border-2 border-black p-2 md:mb-4 mb-8 w-full"
                         />
-                        {errors.name && <FormInputError message={errors.name.message} />}
+                        {errors.name && <ErrorMessage message={errors.name.message} />}
                     </div>
                     <div className="w-full">
                         <input
@@ -60,7 +59,7 @@ export const Contact = () => {
                             type="email"
                             className="border-2 border-black p-2 md:mb-4 mb-8 w-full"
                         />
-                        {errors.email && <FormInputError message={errors.email.message} />}
+                        {errors.email && <ErrorMessage message={errors.email.message} />}
                     </div>
                 </div>
 
@@ -78,7 +77,7 @@ export const Contact = () => {
                     type="text"
                     className="border-2 border-black p-2 md:mb-4 mb-8 "
                 />
-                {errors.phoneNumber && <FormInputError message={errors.phoneNumber.message} />}
+                {errors.phoneNumber && <ErrorMessage message={errors.phoneNumber.message} />}
                 <textarea
                     {...register("message", {
                         required: {
@@ -93,7 +92,7 @@ export const Contact = () => {
                     type="text"
                     className="border-2 border-black p-2 md:mb-4 mb-8 "
                 />
-                {errors.message && <FormInputError message={errors.message.message} />}
+                {errors.message && <ErrorMessage message={errors.message.message} />}
 
                 <SubmitButton buttonText="SUBMIT" loading={loading} isValid={isValid()} />
             </form>
