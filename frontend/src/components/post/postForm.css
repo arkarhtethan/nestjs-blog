@@ -1,0 +1,7 @@
+#postForm ul li {
+    list-style: decimal;
+}
+
+#postForm ol li {
+    list-style: disc;
+}
